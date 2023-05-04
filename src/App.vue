@@ -8,8 +8,8 @@ import Gallery from './views/Gallery.vue'
     <VApp>
       <SideBar />
 
-      <VMain class="main-content ma-5 mt-16 mt-sm-5">
-        <Gallery />
+      <VMain class="main-content ma-5 mt-16 mt-sm-5 d-flex align-center justify-center">
+        <RouterView />
       </VMain>
     </VApp>
   </div>

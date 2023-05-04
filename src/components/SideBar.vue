@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useMobileSettingsStore } from '@/stores/mobileSettings'
 import { storeToRefs } from 'pinia'
-import { onBeforeUnmount } from 'vue'
-import { onMounted } from 'vue'
+import { computed } from 'vue'
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 // === MOBILE DETECTION
 
@@ -17,6 +17,12 @@ const mobileToggled = ref(false)
 
 const setMobile = (value: boolean) => (mobileToggled.value = value)
 const toggleMobile = () => setMobile(!mobileToggled.value)
+
+// === PAGE TOGGLE
+
+const router = useRouter()
+
+const navigate = (page: string) => router.push({ name: page })
 </script>
 
 <template>
@@ -58,10 +64,25 @@ const toggleMobile = () => setMobile(!mobileToggled.value)
     </VList>
 
     <!-- Navigation Links -->
-    <VList nav @click="setMobile(false)">
-      <VListItem prepend-icon="fas fa-users" value="clients" title="Client Index" />
-      <VListItem prepend-icon="fas fa-search-dollar" value="transaction" title="Safe Transaction" />
-      <VListItem prepend-icon="fas fa-images" value="gallery" title="Gallery" />
+    <VList @click="setMobile(false)" item-value="clients" nav>
+      <VListItem
+        prepend-icon="fas fa-users"
+        value="clients"
+        title="Client Index"
+        @click="navigate('clients')"
+      />
+      <VListItem
+        prepend-icon="fas fa-search-dollar"
+        value="transaction"
+        title="Safe Transaction"
+        @click="navigate('transaction')"
+      />
+      <VListItem
+        prepend-icon="fas fa-images"
+        value="gallery"
+        title="Gallery"
+        @click="navigate('gallery')"
+      />
     </VList>
   </VNavigationDrawer>
 </template>
