@@ -157,8 +157,6 @@ const finishManagement = () => {
 
 <template>
   <!-- Balance management -->
-
-  <!-- Client delete confirmation -->
   <VDialog v-model="manageBalance">
     <VCard
       variant="elevated"
@@ -202,6 +200,24 @@ const finishManagement = () => {
 
       <VCardActions class="align-self-end">
         <VBtn @click="finishManagement">Done</VBtn>
+      </VCardActions>
+    </VCard>
+  </VDialog>
+
+  <!-- Client delete confirmation -->
+  <VDialog v-model="pendingDelete">
+    <VCard
+      variant="elevated"
+      class="px-5 pt-3 pb-7 mx-auto"
+      :title="`Delete client ${deletableClient?.name ?? ''}?`"
+      subtitle="This cannot be undone"
+      style="max-width: max-content"
+    >
+      <VCardActions class="align-self-end">
+        <VBtn color="red-darken-4" prepend-icon="fas fa-trash-alt" @click="commitDelete"
+          >Delete</VBtn
+        >
+        <VBtn @click="pendingDelete = false">Cancel</VBtn>
       </VCardActions>
     </VCard>
   </VDialog>
