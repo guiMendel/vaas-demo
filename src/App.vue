@@ -8,19 +8,9 @@ import Gallery from './views/Gallery.vue'
     <VApp>
       <SideBar />
 
-      <VMain class="main-content">
+      <VMain class="main-content ma-5 mt-16 mt-sm-5">
         <Gallery />
       </VMain>
     </VApp>
   </div>
 </template>
-
-<style lang="scss">
-.main-content {
-  margin: 2rem;
-
-  @media (max-width: 768px) {
-    margin-top: 4rem;
-  }
-}
-</style>

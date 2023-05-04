@@ -1,24 +1,14 @@
 <script setup lang="ts">
+import { useMobileSettingsStore } from '@/stores/mobileSettings'
+import { storeToRefs } from 'pinia'
 import { onBeforeUnmount } from 'vue'
-import { computed } from 'vue'
 import { onMounted } from 'vue'
 import { ref } from 'vue'
 
 // === MOBILE DETECTION
 
 // Whether the viewport is mobile
-const isMobile = ref(false)
-
-// Update isMobile to ensure it's accurate
-const detectMobile = () => {
-  isMobile.value = window.innerWidth <= 768
-}
-
-onMounted(() => {
-  window.addEventListener('resize', detectMobile)
-  detectMobile()
-})
-onBeforeUnmount(() => window.removeEventListener('resize', detectMobile))
+const { isMobile } = storeToRefs(useMobileSettingsStore())
 
 // === MOBILE TOGGLE
 
@@ -31,7 +21,22 @@ const toggleMobile = () => setMobile(!mobileToggled.value)
 
 <template>
   <!-- Show open icon when mobile -->
-  <VIcon @click="toggleMobile" icon="fas fa-bars" style="position: fixed; top: 1rem; left: 1rem" />
+  <VAvatar
+    icon="fas fa-bars"
+    color="white"
+    v-if="isMobile && mobileToggled == false"
+    @click="toggleMobile"
+    :style="{
+      position: 'fixed',
+      top: '1rem',
+      left: '1rem',
+      zIndex: 2000
+      // backgroundColor: 'white',
+      // aspectRatio: '1/1',
+      // borderRadius: ''
+    }"
+  >
+  </VAvatar>
 
   <VNavigationDrawer
     :permanent="isMobile == false"
