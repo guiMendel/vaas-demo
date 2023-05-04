@@ -4,6 +4,7 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 import { aliases, fa } from 'vuetify/iconsets/fa'
+import { mdi } from 'vuetify/iconsets/mdi'
 
 // Vuetify
 import 'vuetify/styles'
@@ -19,7 +20,7 @@ const vuetify = createVuetify({
   icons: {
     defaultSet: 'fa',
     aliases,
-    sets: { fa }
+    sets: { fa, mdi }
   }
 })
 
