@@ -5,11 +5,14 @@ import { ref } from 'vue'
 import type { Client } from '@/types/Client.interface'
 import { computed } from 'vue'
 import { watch } from 'vue'
+import { useMobileSettingsStore } from '@/stores/mobileSettings'
 
 const clientStore = useClientsStore()
 
 const { clients } = storeToRefs(clientStore)
 const { addClient, deleteClient } = clientStore
+
+const { isMobile } = storeToRefs(useMobileSettingsStore())
 
 const formatBalance = (value: number | undefined) =>
   value ? (Math.round(value * 100) / 100).toFixed(2) : '0.00'
@@ -147,12 +150,54 @@ const balanceActionMethod = ref<undefined | 'Withdraw' | 'Deposit'>(undefined)
 
 // Value of balance action
 const balanceActionValue = ref(0)
+const setBalance = (rawValue: string) => {
+  const value = parseFloat(rawValue)
 
-// Finish management
-const finishManagement = () => {
-  manageBalance.value = false
-  balanceActionMethod.value = undefined
+  console.log(value, balanceActionValue.value)
+
+  if (isNaN(value) || value < 0) return
+  balanceActionValue.value = value
 }
+
+// Result of current action
+const actionResult = computed(() => {
+  if (balanceActionMethod.value == undefined || manageBalanceClient.value == undefined)
+    return manageBalanceClient.value?.balance
+
+  return balanceActionMethod.value == 'Withdraw'
+    ? manageBalanceClient.value.balance - balanceActionValue.value
+    : manageBalanceClient.value.balance + balanceActionValue.value
+})
+
+// Commits balance action
+const commitBalanceAction = () => {
+  if (actionResult.value != undefined && manageBalanceClient.value != undefined)
+    manageBalanceClient.value.balance = actionResult.value
+
+  balanceActionValue.value = 0
+}
+
+// Unset method when closing dialogue
+watch(manageBalance, (manage) => {
+  if (manage == false) {
+    balanceActionMethod.value = undefined
+    balanceActionValue.value = 0
+  }
+})
+
+const resultStyle = computed(() => {
+  if (
+    balanceActionMethod.value == undefined ||
+    manageBalanceClient.value == undefined ||
+    actionResult.value == undefined ||
+    manageBalanceClient.value.balance == actionResult.value
+  )
+    return {}
+
+  return actionResult.value > manageBalanceClient.value.balance
+    ? { color: 'limeGreen' }
+    : { color: 'fireBrick' }
+})
 </script>
 
 <template>
@@ -166,11 +211,26 @@ const finishManagement = () => {
     >
       <VCardItem>
         <!-- Balance visualization -->
-        <div class="d-flex align-center justify-center my-5" style="gap: 1rem">
+        <div
+          class="d-flex align-end justify-center mt-4 mb-8 flex-wrap"
+          :style="{ gap: '1rem', fontSize: isMobile ? 'inherit' : '1.2rem' }"
+        >
+          <!-- Balance before -->
           <div class="d-flex flex-column align-center">
             <small style="color: gray">Balance Before</small>
             <span class="font-weight-bold">
               {{ formatBalance(manageBalanceClient?.balance) }}
+            </span>
+          </div>
+
+          <!-- Transition arrow -->
+          <VIcon icon="fas fa-long-arrow-alt-right" />
+
+          <!-- Balance after -->
+          <div class="d-flex flex-column align-center">
+            <small style="color: gray">Balance After</small>
+            <span class="font-weight-bold" :style="resultStyle">
+              {{ formatBalance(actionResult) }}
             </span>
           </div>
         </div>
@@ -188,31 +248,47 @@ const finishManagement = () => {
 
           <!-- Action value -->
           <VCol cols="12" sm="4" class="px-2">
-            <VTextField label="Amount" type="number" v-model="balanceActionValue" />
+            <VTextField
+              label="Amount"
+              type="number"
+              min="0"
+              :model-value="balanceActionValue"
+              @update:model-value="setBalance"
+            />
           </VCol>
 
           <!-- Trigger action -->
           <VCol cols="12" sm="4" class="px-2">
-            <VBtn block variant="tonal" style="height: 56px">Perform</VBtn>
+            <VBtn
+              block
+              variant="tonal"
+              style="height: 56px"
+              :disabled="
+                balanceActionMethod == undefined ||
+                balanceActionValue <= 0 ||
+                (actionResult != undefined && actionResult < 0)
+              "
+              @click="commitBalanceAction"
+              >Perform</VBtn
+            >
           </VCol>
         </VRow>
       </VCardItem>
 
       <VCardActions class="align-self-end">
-        <VBtn @click="finishManagement">Done</VBtn>
+        <VBtn @click="manageBalance = false">Done</VBtn>
       </VCardActions>
     </VCard>
   </VDialog>
 
   <!-- Client delete confirmation -->
   <VDialog v-model="pendingDelete">
-    <VCard
-      variant="elevated"
-      class="px-5 pt-3 pb-7 mx-auto"
-      :title="`Delete client ${deletableClient?.name ?? ''}?`"
-      subtitle="This cannot be undone"
-      style="max-width: max-content"
-    >
+    <VCard variant="elevated" class="px-5 pt-3 pb-7 mx-auto" style="width: max-content; max-width: 100%;">
+      <VCardTitle style="max-width: 100%" class="text-wrap">
+        Delete client {{ deletableClient?.name ?? '' }}?
+      </VCardTitle>
+      <VCardSubtitle style="max-width: 100%"> This cannot be undone </VCardSubtitle>
+
       <VCardActions class="align-self-end">
         <VBtn color="red-darken-4" prepend-icon="fas fa-trash-alt" @click="commitDelete"
           >Delete</VBtn
@@ -300,8 +376,8 @@ const finishManagement = () => {
       </div>
 
       <VCardItem>
-        Balance:
-        <span class="text-overline">{{ formatBalance(client.balance) }}</span>
+        <span class="mr-2" style="color: gray">Balance:</span>
+        <span class="text-overline font-weight-bold">{{ formatBalance(client.balance) }}</span>
       </VCardItem>
 
       <VCardActions class="d-flex flex-wrap align-center justify-center" style="gap: 1rem">
