@@ -22,5 +22,12 @@ export const useClientsStore = defineStore('clients', () => {
     delete clients.value[clientId]
   }
 
-  return { clients, addClient, deleteClient }
+  function getByAddress(address: Client['address']) {
+    for (const client of Object.keys(clients.value).map((key) => clients.value[key]))
+      if (client.address == address) return client
+
+    return undefined
+  }
+
+  return { clients, addClient, deleteClient, getByAddress }
 })

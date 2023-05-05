@@ -7,7 +7,8 @@ import { computed } from 'vue'
 import { watch } from 'vue'
 import { useMobileSettingsStore } from '@/stores/mobileSettings'
 import formatBalance from '@/helpers/formatBalance'
-import randomAddress from '@/helpers/randomAddress'
+import { randomAddress } from '@/helpers/random'
+import { addressRules } from '@/helpers/validateAddress'
 
 const clientStore = useClientsStore()
 
@@ -95,19 +96,6 @@ const nameRules = [
     if (value?.length > 3) return true
 
     return 'Name must be more than 3 characters.'
-  }
-]
-
-const addressRules = [
-  (value: string) => {
-    if (value) return true
-
-    return 'Address is required.'
-  },
-  (value: string) => {
-    if (value?.length > 24 && value?.length <= 34) return true
-
-    return 'Address must be between 25 and 34 characters long.'
   }
 ]
 
