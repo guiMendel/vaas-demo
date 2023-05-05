@@ -9,6 +9,7 @@ import { useMobileSettingsStore } from '@/stores/mobileSettings'
 import formatBalance from '@/helpers/formatBalance'
 import { randomAddress } from '@/helpers/random'
 import { addressRules } from '@/helpers/validateAddress'
+import { useRouter } from 'vue-router'
 
 const clientStore = useClientsStore()
 
@@ -98,6 +99,11 @@ const nameRules = [
     return 'Name must be more than 3 characters.'
   }
 ]
+
+const router = useRouter()
+
+const startTransactionFor = (clientId: string) =>
+  router.push({ name: 'transaction', params: { selectedClientId: clientId } })
 
 // === BALANCE MANAGEMENT
 
@@ -359,7 +365,7 @@ const resultStyle = computed(() => {
           @click="manageBalanceClientId = client.id"
           >Manage Balance
         </VBtn>
-        <VBtn class="ma-0" color="grey-darken-2" prepend-icon="fas fa-exchange-alt"
+        <VBtn class="ma-0" color="grey-darken-2" prepend-icon="fas fa-exchange-alt" @click="startTransactionFor(client.id)"
           >Start Transaction
         </VBtn>
       </VCardActions>

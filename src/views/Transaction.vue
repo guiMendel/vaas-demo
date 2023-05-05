@@ -10,10 +10,13 @@ import { ref } from 'vue'
 import validateAddress, { addressRules } from '@/helpers/validateAddress'
 import { watch } from 'vue'
 import type { Institution } from '@/types/Institution.interface'
+import { useRouter } from 'vue-router'
 
 const { isMobile } = storeToRefs(useMobileSettingsStore())
 
 const { retrieveInstitution } = useInstitutionsStore()
+
+const props = defineProps<{ selectedClientId: string | undefined }>()
 
 // Get all clients
 const clientStore = useClientsStore()
@@ -22,10 +25,21 @@ const { clients } = storeToRefs(clientStore)
 const clientList = computed(() => Object.keys(clients.value).map((id) => clients.value[id]))
 
 // Currently selected client id
-const selectedClientId = ref<string | undefined>(undefined)
+// const selectedClientId = ref<string | undefined>(undefined)
 const selectedClient = computed(() =>
-  selectedClientId.value ? clients.value[selectedClientId.value] : undefined
+  props.selectedClientId ? clients.value[props.selectedClientId] : undefined
 )
+
+const router = useRouter()
+
+const clientIdParsed = computed({
+  get: () => (props.selectedClientId === 'undefined' ? undefined : props.selectedClientId),
+  set: (value: string | undefined) =>
+    router.push({
+      name: router.currentRoute.value.name ?? undefined,
+      params: { selectedClientId: value }
+    })
+})
 
 // Transfer amount
 const amount = ref(0)
@@ -142,7 +156,7 @@ const performTransaction = () => {
     <!-- Select client -->
     <VSelect
       label="Client"
-      v-model="selectedClientId"
+      v-model="clientIdParsed"
       :items="clientList"
       item-title="name"
       item-value="id"

@@ -17,9 +17,10 @@ const router = createRouter({
       component: Gallery
     },
     {
-      path: '/transaction',
+      path: '/transaction/:selectedClientId',
       name: 'transaction',
-      component: Transaction
+      component: Transaction,
+      props: true
     }
   ]
 })

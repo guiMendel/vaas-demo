@@ -21,8 +21,6 @@ const toggleMobile = () => setMobile(!mobileToggled.value)
 // === PAGE TOGGLE
 
 const router = useRouter()
-
-const navigate = (page: string) => router.push({ name: page })
 </script>
 
 <template>
@@ -37,9 +35,6 @@ const navigate = (page: string) => router.push({ name: page })
       top: '1rem',
       left: '1rem',
       zIndex: 2000
-      // backgroundColor: 'white',
-      // aspectRatio: '1/1',
-      // borderRadius: ''
     }"
   >
   </VAvatar>
@@ -69,19 +64,19 @@ const navigate = (page: string) => router.push({ name: page })
         prepend-icon="fas fa-users"
         value="clients"
         title="Client Index"
-        @click="navigate('clients')"
+        @click="router.push({ name: 'clients' })"
       />
       <VListItem
         prepend-icon="fas fa-search-dollar"
         value="transaction"
         title="Safe Transaction"
-        @click="navigate('transaction')"
+        @click="router.push({ name: 'transaction', params: { selectedClientId: 'undefined' } })"
       />
       <VListItem
         prepend-icon="fas fa-images"
         value="gallery"
         title="Gallery"
-        @click="navigate('gallery')"
+        @click="router.push({ name: 'gallery' })"
       />
     </VList>
   </VNavigationDrawer>
