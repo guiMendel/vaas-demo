@@ -30,6 +30,11 @@ const selectedClient = computed(() =>
 // Transfer amount
 const amount = ref(0)
 
+// Whether client has enough funds
+const hasFunds = computed(
+  () => selectedClient.value != undefined && selectedClient.value.balance >= amount.value
+)
+
 // Receiver address
 const receiverAddress = ref('')
 
@@ -91,6 +96,41 @@ const riskLabel = computed(() =>
     ? ['None', 'Very Low', 'Low', 'Average', 'High', 'Very High'][risk.value]
     : undefined
 )
+
+const riskColor = computed(
+  () =>
+    (risk.value != undefined &&
+      assessingRisk.value == false &&
+      ((risk.value == 0 && 'green') ||
+        (risk.value <= 1 && 'green-darken-3') ||
+        (risk.value <= 3 && 'yellow-darken-3') ||
+        (risk.value == 4 && 'orange-accent-4') ||
+        (risk.value == 5 && 'red'))) ||
+    'grey'
+)
+
+const transactionInProgress = ref(false)
+const showSuccess = ref(false)
+
+const performTransaction = () => {
+  if (selectedClient.value == undefined || hasFunds.value == false || transactionInProgress.value)
+    return
+
+  transactionInProgress.value = true
+
+  setTimeout(() => {
+    transactionInProgress.value = false
+
+    if (selectedClient.value == undefined || hasFunds.value == false) return
+
+    if (addressedClient.value != undefined) addressedClient.value.balance += amount.value
+
+    selectedClient.value.balance -= amount.value
+    amount.value = 0
+    receiverAddress.value = ''
+    showSuccess.value = true
+  }, randomRangeInt(1000, 3000))
+}
 </script>
 
 <template>
@@ -173,20 +213,13 @@ const riskLabel = computed(() =>
           </div>
         </template>
 
+        <!-- Risk assessment -->
         <VCard
           variant="tonal"
           title="Risk Assessment"
           class="mt-10"
           :subtitle="assessingRisk ? 'Assessing risk...' : 'Assessment complete'"
-          :color="
-            (risk != undefined &&
-              assessingRisk == false &&
-              ((risk <= 1 && 'green') ||
-                (risk <= 3 && 'yellow-darken-3') ||
-                (risk == 4 && 'orange-accent-4') ||
-                (risk == 5 && 'red'))) ||
-            'grey'
-          "
+          :color="riskColor"
         >
           <template v-slot:prepend>
             <VIcon
@@ -219,7 +252,26 @@ const riskLabel = computed(() =>
             </VCol>
           </VRow>
         </VCard>
+
+        <!-- Transaction execution -->
+        <VBtn
+          block
+          class="mt-10 py-6 mb-2"
+          :color="hasFunds ? riskColor : 'grey'"
+          :disabled="assessingRisk || hasFunds == false"
+          prepend-icon="fas fa-coins"
+          @click="performTransaction"
+        >
+          <VProgressCircular v-if="transactionInProgress" indeterminate />
+          <span v-else>Perform Transaction</span>
+        </VBtn>
+
+        <VAlert type="warning" v-if="hasFunds == false" class="font-weight-medium">
+          The selected client doesn't have enough funds for this transaction
+        </VAlert>
       </template>
     </template>
   </div>
+
+  <VSnackbar v-model="showSuccess" :timeout="3000" color="green">Transaction complete!</VSnackbar>
 </template>
