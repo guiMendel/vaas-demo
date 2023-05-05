@@ -6,6 +6,8 @@ import type { Client } from '@/types/Client.interface'
 import { computed } from 'vue'
 import { watch } from 'vue'
 import { useMobileSettingsStore } from '@/stores/mobileSettings'
+import formatBalance from '@/helpers/formatBalance'
+import randomAddress from '@/helpers/randomAddress'
 
 const clientStore = useClientsStore()
 
@@ -13,9 +15,6 @@ const { clients } = storeToRefs(clientStore)
 const { addClient, deleteClient } = clientStore
 
 const { isMobile } = storeToRefs(useMobileSettingsStore())
-
-const formatBalance = (value: number | undefined) =>
-  value ? (Math.round(value * 100) / 100).toFixed(2) : '0.00'
 
 // === CLIENT EDITING
 
@@ -84,27 +83,6 @@ watch(showEditor, (show) => {
 const commitDelete = () => {
   if (pendingDeleteClientId.value) deleteClient(pendingDeleteClientId.value)
   pendingDeleteClientId.value = null
-}
-
-// Generate random address
-const getRandomAddress = () => {
-  const randomRange = (min: number, max: number) => Math.floor(Math.random() * (max - min) + min)
-
-  const characters = '1234567890qwertyuiopasdfghjklzxcvbnm'
-
-  const length = randomRange(25, 34)
-
-  let address = ''
-
-  while (address.length < length) {
-    let character = characters[randomRange(0, characters.length)]
-
-    if (Math.random() > 0.5) character = character.toUpperCase()
-
-    address += character
-  }
-
-  return address
 }
 
 const nameRules = [
@@ -283,7 +261,11 @@ const resultStyle = computed(() => {
 
   <!-- Client delete confirmation -->
   <VDialog v-model="pendingDelete">
-    <VCard variant="elevated" class="px-5 pt-3 pb-7 mx-auto" style="width: max-content; max-width: 100%;">
+    <VCard
+      variant="elevated"
+      class="px-5 pt-3 pb-7 mx-auto"
+      style="width: max-content; max-width: 100%"
+    >
       <VCardTitle style="max-width: 100%" class="text-wrap">
         Delete client {{ deletableClient?.name ?? '' }}?
       </VCardTitle>
@@ -322,7 +304,7 @@ const resultStyle = computed(() => {
                     v-bind="props"
                     variant="text"
                     class="d-flex align-center justify-center mt-n3 pr-2 pb-1"
-                    @click="editClientAddress = getRandomAddress()"
+                    @click="editClientAddress = randomAddress()"
                   />
                 </template>
               </VTooltip> </template
@@ -362,6 +344,7 @@ const resultStyle = computed(() => {
             class="ma-0"
             icon="fas fa-pen"
             @click="editClient(client)"
+            color="grey-darken-2"
           ></VBtn>
           <!-- Delete client -->
           <VBtn
@@ -381,10 +364,16 @@ const resultStyle = computed(() => {
       </VCardItem>
 
       <VCardActions class="d-flex flex-wrap align-center justify-center" style="gap: 1rem">
-        <VBtn class="ma-0" prepend-icon="fas fa-wallet" @click="manageBalanceClientId = client.id"
+        <VBtn
+          class="ma-0"
+          prepend-icon="fas fa-wallet"
+          color="grey-darken-2"
+          @click="manageBalanceClientId = client.id"
           >Manage Balance
         </VBtn>
-        <VBtn class="ma-0" prepend-icon="fas fa-exchange-alt">Start Transaction </VBtn>
+        <VBtn class="ma-0" color="grey-darken-2" prepend-icon="fas fa-exchange-alt"
+          >Start Transaction
+        </VBtn>
       </VCardActions>
     </VCard>
 
