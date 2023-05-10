@@ -6,7 +6,9 @@ import { computed } from 'vue'
 
 // === USER INFO
 
-const { userProfile } = storeToRefs(useAuthStore())
+const auth = useAuthStore()
+const { signOut } = auth
+const { userProfile } = storeToRefs(auth)
 
 const name = computed(() => {
   let name = ''
@@ -24,7 +26,7 @@ const name = computed(() => {
     style="box-shadow: none; gap: 1rem"
   >
     <template v-slot:prepend>
-      <UserAvatar :user="userProfile" style="font-size: 3rem;" />
+      <UserAvatar :user="userProfile" style="font-size: 3rem" />
     </template>
 
     <VCardTitle class="text-h4" style="line-height: 1.5rem">{{ name }}</VCardTitle>
@@ -34,7 +36,9 @@ const name = computed(() => {
     }}</VCardSubtitle>
 
     <VCardActions>
-      <VBtn prepend-icon="fas fa-sign-out-alt" class="px-5" color="red">Sign Out</VBtn>
+      <VBtn prepend-icon="fas fa-sign-out-alt" class="px-5" color="red" @click="signOut"
+        >Sign Out</VBtn
+      >
     </VCardActions>
   </VCard>
 </template>
