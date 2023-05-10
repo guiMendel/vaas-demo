@@ -125,8 +125,6 @@ const balanceActionValue = ref(0)
 const setBalance = (rawValue: string) => {
   const value = parseFloat(rawValue)
 
-  console.log(value, balanceActionValue.value)
-
   if (isNaN(value) || value < 0) return
   balanceActionValue.value = value
 }

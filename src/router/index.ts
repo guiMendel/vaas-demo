@@ -26,11 +26,6 @@ const router = createRouter({
           component: Clients
         },
         {
-          path: '/gallery',
-          name: 'gallery',
-          component: Gallery
-        },
-        {
           path: '/transaction/:selectedClientId',
           name: 'transaction',
           component: Transaction,

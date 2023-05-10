@@ -83,12 +83,6 @@ const router = useRouter()
         title="Safe Transaction"
         @click="router.push({ name: 'transaction', params: { selectedClientId: 'undefined' } })"
       />
-      <VListItem
-        prepend-icon="fas fa-images"
-        value="gallery"
-        title="Gallery"
-        @click="router.push({ name: 'gallery' })"
-      />
     </VList>
   </VNavigationDrawer>
 </template>

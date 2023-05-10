@@ -12,8 +12,6 @@ const getId = (index: number) => index * 10 + parseInt(props.page)
 const select = (index: number) => {
   emit('update:modelValue', getId(index) == props.modelValue ? undefined : getId(index))
 }
-
-watch(props, console.log)
 </script>
 
 <template>
