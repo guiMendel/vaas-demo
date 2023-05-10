@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import Keycloak from 'keycloak-js'
+import Keycloak, { type KeycloakProfile } from 'keycloak-js'
 
 export const useAuthStore = defineStore('auth', () => {
   // Whether user is authenticated
   const isAuthenticated = ref(false)
 
-  // Logged client token
-  const token = ref<string | undefined>(undefined)
+  // Logged client profile
+  const userProfile = ref<KeycloakProfile | undefined>(undefined)
 
   // Handle a keycloak promise error
   const handleError = (message: string) => (reason: any) => {
@@ -24,23 +24,23 @@ export const useAuthStore = defineStore('auth', () => {
     clientId: import.meta.env.VITE_KEYCLOAK_CLIENT
   })
 
+  const syncClientVariables = async () => {
+    isAuthenticated.value = client.authenticated == true
+
+    return client.loadUserProfile().then((profile) => (userProfile.value = profile))
+  }
+
   // Will be resolved once auth client is ready
   const clientSetupPromise = ref(
     client
       .init({ onLoad: 'check-sso' })
-      .then((authenticated) => {
-        token.value = client.token
-        isAuthenticated.value = authenticated
-      })
+      .then(syncClientVariables)
       .catch(handleError('Failed to initialize keycloak client'))
   )
 
   // Logs-in through keycloak interface
   const goToSignIn = () =>
-    client
-      .login()
-      .then(() => (isAuthenticated.value = true))
-      .catch(handleError('Sign in failed'))
+    client.login().then(syncClientVariables).catch(handleError('Sign in failed'))
 
-  return { isAuthenticated, goToSignIn, clientSetupPromise, token }
+  return { isAuthenticated, goToSignIn, clientSetupPromise, userProfile }
 })

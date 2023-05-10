@@ -1,9 +1,14 @@
 <script setup lang="ts">
+import { useAuthStore } from '@/stores/auth'
 import { useMobileSettingsStore } from '@/stores/mobileSettings'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+
+// === USER INFO
+
+const { userProfile } = storeToRefs(useAuthStore())
 
 // === MOBILE DETECTION
 
@@ -52,10 +57,17 @@ const router = useRouter()
     <!-- User profile -->
     <VList style="margin-bottom: 2rem">
       <VListItem
-        prepend-avatar="https://avatars0.githubusercontent.com/u/9064066?v=4&s=460"
-        title="Ian Smith"
-        subtitle="ian.smith@vaas.com"
-      />
+        v-if="userProfile != undefined"
+        :title="`${userProfile.firstName} ${userProfile.lastName}`"
+        :subtitle="`${userProfile.email}`"
+      >
+        <template v-slot:prepend>
+          <VAvatar color="blue" class="d-flex align-center justify-center pb-1">
+            {{ userProfile.firstName?.charAt(0).toUpperCase()
+            }}{{ userProfile.lastName?.charAt(0).toUpperCase() }}
+          </VAvatar>
+        </template>
+      </VListItem>
     </VList>
 
     <!-- Navigation Links -->
