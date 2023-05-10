@@ -4,6 +4,7 @@ import Gallery from '@/views/Gallery.vue'
 import Transaction from '@/views/Transaction.vue'
 import Home from '@/views/Home.vue'
 import Login from '@/views/Login.vue'
+import Profile from '@/views/Profile.vue'
 import navigationGuards from './navigationGuards'
 
 const router = createRouter({
@@ -14,6 +15,11 @@ const router = createRouter({
       name: 'home',
       component: Home,
       children: [
+        {
+          path: '/profile',
+          name: 'profile',
+          component: Profile
+        },
         {
           path: '/',
           name: 'clients',

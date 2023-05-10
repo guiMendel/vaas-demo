@@ -5,6 +5,7 @@ import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import UserAvatar from './UserAvatar.vue'
 
 // === USER INFO
 
@@ -60,13 +61,11 @@ const router = useRouter()
         v-if="userProfile != undefined"
         :title="`${userProfile.firstName} ${userProfile.lastName}`"
         :subtitle="`${userProfile.email}`"
+        v-ripple
+        style="cursor: pointer"
+        @click="router.push({ name: 'profile' })"
       >
-        <template v-slot:prepend>
-          <VAvatar color="blue" class="d-flex align-center justify-center pb-1">
-            {{ userProfile.firstName?.charAt(0).toUpperCase()
-            }}{{ userProfile.lastName?.charAt(0).toUpperCase() }}
-          </VAvatar>
-        </template>
+        <template v-slot:prepend> <UserAvatar :user="userProfile" /> </template>
       </VListItem>
     </VList>
 
