@@ -65,7 +65,7 @@ const router = useRouter()
         style="cursor: pointer"
         @click="router.push({ name: 'profile' })"
       >
-        <template v-slot:prepend> <UserAvatar :user="userProfile" /> </template>
+        <template v-slot:prepend> <UserAvatar :user="userProfile" class="mr-5" /> </template>
       </VListItem>
     </VList>
 

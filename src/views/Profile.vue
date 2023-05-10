@@ -26,7 +26,7 @@ const name = computed(() => {
     style="box-shadow: none; gap: 1rem"
   >
     <template v-slot:prepend>
-      <UserAvatar :user="userProfile" style="font-size: 3rem" />
+      <UserAvatar :user="userProfile" style="font-size: 3rem" editable />
     </template>
 
     <VCardTitle class="text-h4" style="line-height: 1.5rem">{{ name }}</VCardTitle>

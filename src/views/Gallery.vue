@@ -1,18 +1,36 @@
 <script setup lang="ts">
-import { useMobileSettingsStore } from '@/stores/mobileSettings'
-import { storeToRefs } from 'pinia'
+import { watch } from 'vue'
 
-// Whether the viewport is mobile
-const { isMobile } = storeToRefs(useMobileSettingsStore())
+const props = defineProps<{
+  modelValue: number | undefined
+  page: string
+  count: number
+}>()
+const emit = defineEmits(['update:modelValue'])
+
+const getId = (index: number) => index * 10 + parseInt(props.page)
+const select = (index: number) => {
+  emit('update:modelValue', getId(index) == props.modelValue ? undefined : getId(index))
+}
+
+watch(props, console.log)
 </script>
 
 <template>
   <VRow>
-    <VCol v-for="n in 200" :key="n" cols="4" sm="3" lg="2">
-      <VCard>
+    <VCol v-for="n in count" :key="n" cols="4" sm="3" lg="2">
+      <VCard
+        class="rounded-circle"
+        :variant="getId(n) == modelValue ? 'elevated' : 'plain'"
+        :style="{
+          cursor: 'pointer',
+          border: getId(n) == modelValue ? '5px solid yellow' : '5px solid rgba(0,0,0,0)'
+        }"
+        @click="select(n)"
+      >
         <VImg
-          :src="`https://picsum.photos/500/300?image=${n * 3 + 5}`"
-          :lazy-src="`https://picsum.photos/10/6?image=${n * 3 + 5}`"
+          :src="`https://picsum.photos/500/300?image=${getId(n)}`"
+          :lazy-src="`https://picsum.photos/10/6?image=${getId(n)}`"
           aspect-ratio="1"
           cover
         >
